@@ -34,7 +34,6 @@ export const App: React.FC = () => {
   }, [inputParam, loadDate])
 
   const filteredTodos = useMemo(() => {
-    console.log('filtered todos')
     return [...filteredBySelected].filter((todo: Todo) => {
       return todo.title.toLowerCase().includes(inputParam.toLowerCase());
     });
