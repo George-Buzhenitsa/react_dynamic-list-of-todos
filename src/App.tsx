@@ -17,7 +17,8 @@ export const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [selectedParam, setSelectedParam] = useState<string>('all');
   const [inputParam, setInputParam] = useState<string>('');
-  const loadDate: Date = new Date();
+  const [isTodosLoading, setIsTodosLoading] = useState<boolean>(true);
+  const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
 
   const filteredBySelected = useMemo(() => {
     return [...todos].filter((todo: Todo) => {
@@ -31,33 +32,45 @@ export const App: React.FC = () => {
 
       return todo;
     });
-  }, [inputParam, loadDate])
+  }, [todos, selectedParam])
 
   const filteredTodos = useMemo(() => {
     return [...filteredBySelected].filter((todo: Todo) => {
       return todo.title.toLowerCase().includes(inputParam.toLowerCase());
     });
-  }, [inputParam, loadDate]);
+  }, [inputParam, todos, selectedParam]);
 
   const getTodoData = async () => {
     const todoData = await getTodos();
     setTodos(todoData);
+    setIsTodosLoading(false);
   }
 
-  const getSelectedTodo = (todoId: number | null) => {
+
+  const onSelect = (param: string) => {
+    setSelectedParam(param);
+  }
+
+  const onInput = (param: string) => {
+    setInputParam(param);
+  }
+
+  const handleSelectTodo = (todoId: number | null) => {
     setSelectedTodo(null);
     setUser(null);
     const foundTodo = todos.find((todo: Todo) => todoId === todo.id) || null;
     setSelectedTodo(foundTodo);
     getSelectedUser(foundTodo?.userId);
-  }
+  };
 
   const getSelectedUser = async (userId: number | undefined) => {
+    setIsUserLoading(true);
     if (!userId) {
       return;
     }
     const userData = await getUser(userId);
     setUser(userData);
+    setIsUserLoading(false);
   }
 
   useEffect(() => {
@@ -72,18 +85,15 @@ export const App: React.FC = () => {
             <h1 className="title">Todos:</h1>
 
             <div className="block">
-              <TodoFilter
-                setSelectedParam={setSelectedParam}
-                setInputParam={setInputParam}
-              />
+              <TodoFilter onSelect={onSelect} onInput={onInput} />
             </div>
 
             <div className="block">
-              {todos.length === 0 && <Loader />}
+              {isTodosLoading && <Loader />}
               <TodoList
                 todos={filteredTodos}
                 selectedTodo={selectedTodo}
-                getSelectedTodo={getSelectedTodo}
+                onSelectTodo={handleSelectTodo}
               />
             </div>
           </div>
@@ -94,7 +104,8 @@ export const App: React.FC = () => {
         <TodoModal
           selectedTodo={selectedTodo}
           user={user}
-          getSelectedTodo={getSelectedTodo}
+          isUserLoading={isUserLoading}
+          onClose={handleSelectTodo}
         />
       )}
     </>

@@ -1,28 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
-  setSelectedParam: (value: string) => void;
-  setInputParam: (value: string) => void;
+  onSelect: (value: string) => void;
+  onInput: (value: string) => void;
 }
 
-export const TodoFilter: React.FC<Props> = ({ setSelectedParam, setInputParam }) => {
+export const TodoFilter: React.FC<Props> = ({ onSelect, onInput }) => {
   const [inputValue, setInputValue] = useState<string>('');
   const [selectedValue, setSelectedValue] = useState<string>('all');
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
-    setInputParam(event.target.value);
+    onInput(event.target.value);
   };
 
   const handleSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedValue(event.target.value);
-    setSelectedParam(event.target.value);
+    onSelect(event.target.value);
   };
 
   const resetFilters = () => {
     setInputValue('');
-    setInputParam('');
+    onInput('');
+    setSelectedValue('all');
+    onSelect('all')
   };
+
+  useEffect(() => {
+    onSelect('all');
+  }, [])
 
   return (
     <form className="field has-addons">

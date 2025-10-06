@@ -7,19 +7,21 @@ import classNames from 'classnames';
 interface Props {
   selectedTodo: Todo | null;
   user: User | null;
-  getSelectedTodo: (id: null) => void
+  isUserLoading: boolean;
+  onClose: (id: number | null) => void;
 }
 
 export const TodoModal: React.FC<Props> = ({
   selectedTodo,
   user,
-  getSelectedTodo,
+  isUserLoading,
+  onClose,
 }) => {
   return (
     <div className="modal is-active" data-cy="modal">
       <div className="modal-background" />
 
-      {user === null ? (
+      {isUserLoading ? (
         <Loader />
       ) : (
         <div className="modal-card">
@@ -36,7 +38,7 @@ export const TodoModal: React.FC<Props> = ({
               type="button"
               className="delete"
               data-cy="modal-close"
-              onClick={() => getSelectedTodo(null)}
+              onClick={() => onClose(null)}
             />
           </header>
 
@@ -47,15 +49,18 @@ export const TodoModal: React.FC<Props> = ({
 
             <p className="block" data-cy="modal-user">
               {/* <strong className="has-text-success">Done</strong> */}
-              <strong className={classNames({
-                "has-text-danger" : !selectedTodo?.completed,
-                'has-text-success' : selectedTodo?.completed
-              })}
-              >{selectedTodo?.completed ? 'Done' : 'Planned'}</strong>
+              <strong
+                className={classNames({
+                  'has-text-danger': !selectedTodo?.completed,
+                  'has-text-success': selectedTodo?.completed,
+                })}
+              >
+                {selectedTodo?.completed ? 'Done' : 'Planned'}
+              </strong>
 
               {' by '}
 
-              <a href="mailto:Sincere@april.biz">{user?.name}</a>
+              <a href={`mailto:${user?.email}`}>{user?.name}</a>
             </p>
           </div>
         </div>
