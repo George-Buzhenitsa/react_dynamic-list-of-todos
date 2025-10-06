@@ -55,6 +55,16 @@ export const App: React.FC = () => {
     setInputParam(param);
   };
 
+    const getSelectedUser = async (userId: number | undefined) => {
+      if (!userId) {
+        return;
+      }
+      setIsUserLoading(true);
+      const userData = await getUser(userId);
+      setUser(userData);
+      setIsUserLoading(false);
+    };
+
   const handleSelectTodo = (todoId: number | null) => {
     if (todoId === null) {
       setSelectedTodo(null);
@@ -67,16 +77,6 @@ export const App: React.FC = () => {
     if (foundTodo) {
       getSelectedUser(foundTodo.userId);
     }
-  };
-
-  const getSelectedUser = async (userId: number | undefined) => {
-    if (!userId) {
-      return;
-    }
-    setIsUserLoading(true);
-    const userData = await getUser(userId);
-    setUser(userData);
-    setIsUserLoading(false);
   };
 
   useEffect(() => {
