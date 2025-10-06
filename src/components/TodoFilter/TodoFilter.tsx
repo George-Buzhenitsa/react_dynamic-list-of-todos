@@ -22,8 +22,6 @@ export const TodoFilter: React.FC<Props> = ({ onSelect, onInput }) => {
   const resetFilters = () => {
     setInputValue('');
     onInput('');
-    setSelectedValue('all');
-    onSelect('all')
   };
 
   useEffect(() => {

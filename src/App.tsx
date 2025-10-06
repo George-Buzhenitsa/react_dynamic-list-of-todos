@@ -17,8 +17,8 @@ export const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [selectedParam, setSelectedParam] = useState<string>('all');
   const [inputParam, setInputParam] = useState<string>('');
-  const [isTodosLoading, setIsTodosLoading] = useState<boolean>(true);
-  const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
+  const [isTodosLoading, setIsTodosLoading] = useState<boolean>(false);
+  const [isUserLoading, setIsUserLoading] = useState<boolean>(false);
 
   const filteredBySelected = useMemo(() => {
     return [...todos].filter((todo: Todo) => {
@@ -32,50 +32,56 @@ export const App: React.FC = () => {
 
       return todo;
     });
-  }, [todos, selectedParam])
+  }, [todos, selectedParam]);
 
   const filteredTodos = useMemo(() => {
     return [...filteredBySelected].filter((todo: Todo) => {
       return todo.title.toLowerCase().includes(inputParam.toLowerCase());
     });
-  }, [inputParam, todos, selectedParam]);
+  }, [inputParam, filteredBySelected]);
 
   const getTodoData = async () => {
+    setIsTodosLoading(true);
     const todoData = await getTodos();
     setTodos(todoData);
     setIsTodosLoading(false);
-  }
-
+  };
 
   const onSelect = (param: string) => {
     setSelectedParam(param);
-  }
+  };
 
   const onInput = (param: string) => {
     setInputParam(param);
-  }
+  };
 
   const handleSelectTodo = (todoId: number | null) => {
-    setSelectedTodo(null);
-    setUser(null);
+    if (todoId === null) {
+      setSelectedTodo(null);
+      setUser(null);
+      setIsUserLoading(false);
+      return;
+    }
     const foundTodo = todos.find((todo: Todo) => todoId === todo.id) || null;
     setSelectedTodo(foundTodo);
-    getSelectedUser(foundTodo?.userId);
+    if (foundTodo) {
+      getSelectedUser(foundTodo.userId);
+    }
   };
 
   const getSelectedUser = async (userId: number | undefined) => {
-    setIsUserLoading(true);
     if (!userId) {
       return;
     }
+    setIsUserLoading(true);
     const userData = await getUser(userId);
     setUser(userData);
     setIsUserLoading(false);
-  }
+  };
 
   useEffect(() => {
     getTodoData();
-  }, [])
+  }, []);
 
   return (
     <>
